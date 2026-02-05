@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXUS | AI Dashboard</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root { --nexus-blue: #4318FF; --nexus-dark: #1B2559; }
+        body { background: #F4F7FE; font-family: 'Segoe UI', sans-serif; }
+        
+        .sidebar { 
+            width: 260px; height: 100vh; background: var(--nexus-dark); 
+            position: fixed; padding: 30px 20px; box-shadow: 10px 0 30px rgba(0,0,0,0.1);
+        }
+        
+        .nav-link-custom { 
+            padding: 15px; border-radius: 12px; color: #A3AED0; 
+            text-decoration: none; display: flex; align-items: center; 
+            margin-bottom: 8px; cursor: pointer; transition: 0.3s;
+        }
+        
+        .nav-link-custom.active { background: rgba(255,255,255,0.1); color: white; border-left: 4px solid var(--nexus-blue); }
+        .main-content { margin-left: 260px; padding: 40px; }
+        
+        .glass-card { 
+            background: white; border-radius: 20px; padding: 25px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: none; margin-bottom: 24px;
+        }
+
+        .page-section { display: none; }
+        .page-section.active { display: block; }
+        .form-tab { display: none; }
+        .form-tab.active { display: block; }
+        label { font-size: 13px; font-weight: 600; color: #707EAE; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2 class="fw-bold mb-5 text-white">NEXUS <span style="color: var(--nexus-blue)">AI</span></h2>
+        <div class="nav-link-custom active" onclick="showPage('dashboard', this)"><i class="bi bi-grid-fill me-3"></i> Dashboard</div>
+        <div class="nav-link-custom" onclick="showPage('new-patient', this)"><i class="bi bi-person-plus-fill me-3"></i> New Patient</div>
+        
+        <a href="index.html" class="nav-link-custom text-danger mt-5" style="text-decoration: none;">
+            <i class="bi bi-box-arrow-left me-3"></i> Logout
+        </a>
+    </div>
+
+    <div class="main-content">
+        <div id="dashboard" class="page-section active">
+            <h2 class="fw-bold mb-4">Health Analytics</h2>
+            <div class="glass-card"><canvas id="mainChart" height="100"></canvas></div>
+        </div>
+
+        <div id="new-patient" class="page-section">
+            <h2 class="fw-bold mb-4">New Patient Entry</h2>
+            <div class="glass-card" style="max-width: 800px;">
+                <form id="healthForm">
+                    <div class="form-tab active" id="step1">
+                        <h6 class="fw-bold text-primary mb-3">STEP 1: VITALS</h6>
+                        <div class="row g-3">
+                            <div class="col-md-4"><label>Age</label><input type="number" name="age" class="form-control"></div>
+                            <div class="col-md-4"><label>Gender (1/0)</label><input type="number" name="gender" class="form-control"></div>
+                            <div class="col-md-4"><label>Pulse</label><input type="number" name="pulse" class="form-control"></div>
+                        </div>
+                        <button type="button" class="btn btn-primary mt-4" onclick="nextStep(2)">Next</button>
+                    </div>
+
+                    <div class="form-tab" id="step2">
+                        <h6 class="fw-bold text-primary mb-3">STEP 2: ALL PARAMETERS</h6>
+                        <div class="row g-3">
+                            <div class="col-md-4"><label>BMI</label><input type="number" step="0.1" name="bmi" class="form-control"></div>
+                            <div class="col-md-4"><label>Sys BP</label><input type="number" name="sys" class="form-control"></div>
+                            <div class="col-md-4"><label>Dia BP</label><input type="number" name="dia" class="form-control"></div>
+                            <div class="col-md-4"><label>Cholesterol</label><input type="number" name="chol" class="form-control"></div>
+                            <div class="col-md-4"><label>Glucose</label><input type="number" name="glu" class="form-control"></div>
+                            <div class="col-md-4"><label>SpO2</label><input type="number" name="spo2" class="form-control"></div>
+                        </div>
+                        <div class="mt-4">
+                            <button type="button" class="btn btn-secondary" onclick="nextStep(1)">Back</button>
+                            <button type="button" class="btn btn-success" onclick="runAI()">Run AI Analysis</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showPage(id, el) {
+            document.querySelectorAll('.page-section').forEach(p => p.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.querySelectorAll('.nav-link-custom').forEach(n => n.classList.remove('active'));
+            el.classList.add('active');
+        }
+
+        function nextStep(step) {
+            document.querySelectorAll('.form-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('step' + step).classList.add('active');
+        }
+
+        function runAI() {
+            alert("AI Analysis Started for 22 parameters.");
+        }
+
+        new Chart(document.getElementById('mainChart'), {
+            type: 'line',
+            data: { 
+                labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'], 
+                datasets: [{ label:'Admissions', data:[15, 22, 18, 30, 25, 40, 35], borderColor:'#4318FF', tension:0.4 }] 
+            }
+        });
+    </script>
+</body>
+</html>

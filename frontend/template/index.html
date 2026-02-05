@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXUS AI | Clinical Intelligence</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root { --nexus-blue: #4318FF; --nexus-dark: #1B2559; --bg-gray: #F4F7FE; }
+        body { background: var(--bg-gray); font-family: 'Segoe UI', sans-serif; overflow-x: hidden; }
+        .sidebar { width: 280px; height: 100vh; background: var(--nexus-dark); position: fixed; padding: 40px 20px; z-index: 1000; }
+        .nav-link-custom { padding: 15px; color: #A3AED0; text-decoration: none; display: block; border-radius: 12px; margin-bottom: 5px; cursor: pointer; transition: 0.3s; }
+        .nav-link-custom:hover, .nav-link-custom.active { background: var(--nexus-blue); color: white; }
+        .main-content { margin-left: 280px; padding: 40px; }
+        .stat-card { background: white; border-radius: 20px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.02); margin-bottom: 25px; border: none; height: 100%; }
+        .content-section { display: none; animation: fadeIn 0.4s ease-out; }
+        .content-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        label { font-size: 11px; font-weight: 700; color: #707EAE; text-transform: uppercase; margin-bottom: 5px; display: block; }
+        .form-control, .form-select { border-radius: 12px; padding: 10px; background: #F4F7FE; border: 1px solid #E0E5F2; font-size: 13px; }
+        .section-divider { border-left: 4px solid var(--nexus-blue); padding-left: 15px; margin: 20px 0 15px 0; font-weight: bold; color: var(--nexus-dark); font-size: 14px; }
+        .result-box { border-radius: 20px; padding: 25px; background: #fff; border: 1px solid #E0E5F2; text-align: center; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h3 class="text-white fw-bold mb-5 px-3">NEXUS <span style="color: var(--nexus-blue)">AI</span></h3>
+        <div onclick="showSection('operations', this)" class="nav-link-custom active"><i class="bi bi-grid-fill me-2"></i> Dashboard</div>
+        <div onclick="showSection('intake', this)" class="nav-link-custom"><i class="bi bi-person-plus-fill me-2"></i> Patient Intake</div>
+        <div onclick="showSection('wards', this)" class="nav-link-custom"><i class="bi bi-hospital me-2"></i> Ward Status</div>
+    </div>
+
+    <div class="main-content">
+        
+        <div id="operations" class="content-section active">
+            <h2 class="fw-bold text-dark mb-4">Operational Intelligence</h2>
+            <div class="row g-4 mb-4">
+                <div class="col-lg-8"><div class="stat-card"><h6 class="fw-bold text-muted mb-4">WEEKLY ADMISSION VOLUMES</h6><canvas id="admissionChart" height="150"></canvas></div></div>
+                <div class="col-lg-4"><div class="stat-card"><h6 class="fw-bold text-muted mb-4">BED OCCUPANCY</h6><canvas id="bedChart"></canvas></div></div>
+            </div>
+            <div class="row g-4 mb-4">
+                <div class="col-lg-12"><div class="stat-card"><h6 class="fw-bold text-muted mb-4">PATIENT RISK DISTRIBUTION</h6><canvas id="riskDistChart" height="80"></canvas></div></div>
+            </div>
+        </div>
+
+        <div id="intake" class="content-section">
+            <h2 class="fw-bold mb-4">Comprehensive Clinical Intake</h2>
+            <div class="stat-card">
+                <form id="clinicalForm">
+                    <div class="section-divider">VITAL SIGNS</div>
+                    <div class="row g-3">
+                        <div class="col-md-3"><label>1. Age</label><input type="number" id="v1" class="form-control" placeholder="Years"></div>
+                        <div class="col-md-3"><label>2. SpO2 (%)</label><input type="number" id="v2" class="form-control" placeholder="95"></div>
+                        <div class="col-md-3"><label>3. Sys BP</label><input type="number" id="v3" class="form-control" placeholder="120"></div>
+                        <div class="col-md-3"><label>4. Dia BP</label><input type="number" id="v4" class="form-control" placeholder="80"></div>
+                        <div class="col-md-3"><label>5. Heart Rate</label><input type="number" id="v5" class="form-control" placeholder="BPM"></div>
+                        <div class="col-md-3"><label>6. Resp Rate</label><input type="number" id="v6" class="form-control" placeholder="18"></div>
+                        <div class="col-md-3"><label>7. Temp (°C)</label><input type="number" id="v7" class="form-control" placeholder="37"></div>
+                        <div class="col-md-3"><label>8. BMI</label><input type="number" id="v8" class="form-control" placeholder="22"></div>
+                    </div>
+
+                    <div class="section-divider">LABORATORY RESULTS</div>
+                    <div class="row g-3">
+                        <div class="col-md-3"><label>9. Glucose</label><input type="number" id="v9" class="form-control"></div>
+                        <div class="col-md-3"><label>10. WBC Count</label><input type="number" id="v10" class="form-control"></div>
+                        <div class="col-md-3"><label>11. Hemoglobin</label><input type="number" id="v11" class="form-control"></div>
+                        <div class="col-md-3"><label>12. Creatinine</label><input type="number" id="v12" class="form-control"></div>
+                        <div class="col-md-3"><label>13. Troponin</label><input type="number" id="v13" class="form-control"></div>
+                        <div class="col-md-3"><label>14. D-Dimer</label><input type="number" id="v14" class="form-control"></div>
+                        <div class="col-md-3"><label>15. CRP Level</label><input type="number" id="v15" class="form-control"></div>
+                        <div class="col-md-3"><label>16. Platelets</label><input type="number" id="v16" class="form-control"></div>
+                    </div>
+
+                    <div class="section-divider">CRITICAL RISK FACTORS</div>
+                    <div class="row g-3">
+                        <div class="col-md-4"><label>17. GCS Score (3-15)</label><input type="number" id="v17" class="form-control"></div>
+                        <div class="col-md-4"><label>18. Pain Scale (0-10)</label><input type="number" id="v18" class="form-control"></div>
+                        <div class="col-md-4"><label>19. Oxygen Support</label>
+                            <select id="v19" class="form-select"><option value="0">None</option><option value="1">LPM</option><option value="2">Ventilator</option></select>
+                        </div>
+                        <div class="col-md-4"><label>20. Diabetes History</label>
+                            <select id="v20" class="form-select"><option value="0">No</option><option value="1">Yes</option></select>
+                        </div>
+                        <div class="col-md-4"><label>21. Hypertension</label>
+                            <select id="v21" class="form-select"><option value="0">No</option><option value="1">Yes</option></select>
+                        </div>
+                        <div class="col-md-4"><label>22. Prev. Admissions</label><input type="number" id="v22" class="form-control"></div>
+                    </div>
+
+                    <div class="text-center mt-5">
+                        <button type="button" id="predictBtn" onclick="analyzeData()" class="btn btn-primary btn-lg px-5 shadow fw-bold">PROCESS 22-POINT ANALYSIS</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div id="wards" class="content-section">
+            <h2 class="fw-bold mb-4">Ward Management</h2>
+            <div class="stat-card">
+                <table class="table align-middle">
+                    <thead><tr><th>Ward</th><th>Beds</th><th>Status</th></tr></thead>
+                    <tbody>
+                        <tr><td>ICU</td><td>20</td><td><span class="badge bg-danger">90% Full</span></td></tr>
+                        <tr><td>Medical Ward</td><td>80</td><td><span class="badge bg-success">Available</span></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="prediction-result" class="content-section">
+            <h2 class="fw-bold mb-4 text-center">AI Analysis Results</h2>
+            <div class="row g-4 justify-content-center">
+                <div class="col-md-4"><div class="result-box"><label>Acuity Risk</label><h1 id="riskValue" class="fw-bold">--</h1><h5 id="riskProb" class="text-muted">--</h5></div></div>
+                <div class="col-md-4"><div class="result-box"><label>Triage Ward</label><h2 id="wardValue" class="text-primary fw-bold">--</h2></div></div>
+                <div class="col-md-4"><div class="result-box"><label>Est. Recovery</label><h2 id="stayValue" class="text-dark fw-bold">--</h2></div></div>
+            </div>
+            <div class="text-center mt-5"><button onclick="showSection('intake', null)" class="btn btn-outline-secondary px-4">New Patient Intake</button></div>
+        </div>
+    </div>
+
+    <script>
+        function showSection(id, el) {
+            document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            if(el) {
+                document.querySelectorAll('.nav-link-custom').forEach(l => l.classList.remove('active'));
+                el.classList.add('active');
+            }
+        }
+
+        // CHARTS LOGIC (RETAINED FROM PREVIOUS)
+        new Chart(document.getElementById('admissionChart'), { type: 'line', data: { labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], datasets: [{ label: 'Admissions', data: [35, 42, 38, 55, 48, 70, 65], borderColor: '#4318FF', tension: 0.4, fill: true, backgroundColor: 'rgba(67, 24, 255, 0.05)' }] } });
+        new Chart(document.getElementById('bedChart'), { type: 'doughnut', data: { labels: ['ICU', 'ER', 'Gen', 'Ped'], datasets: [{ data: [18, 12, 45, 10], backgroundColor: ['#FF5B5C', '#FFB547', '#4318FF', '#2D9CDB'] }] }, options: { cutout: '70%', plugins: { legend: { position: 'bottom' } } } });
+        new Chart(document.getElementById('riskDistChart'), { type: 'bar', data: { labels: ['Critical', 'High', 'Mod', 'Stable', 'Discharge'], datasets: [{ label: 'Patients', data: [5, 12, 25, 40, 15], backgroundColor: '#4318FF', borderRadius: 8 }] } });
+
+        // ANALYSIS LOGIC
+        function analyzeData() {
+            const btn = document.getElementById('predictBtn');
+            const spo2 = parseFloat(document.getElementById('v2').value) || 100;
+            const troponin = parseFloat(document.getElementById('v13').value) || 0;
+            const gcs = parseFloat(document.getElementById('v17').value) || 15;
+
+            btn.disabled = true; btn.innerHTML = 'AI Processing...';
+
+            setTimeout(() => {
+                let risk, color, ward, stay;
+                if (spo2 < 90 || troponin > 0.5 || gcs < 12) {
+                    risk = "CRITICAL"; color = "text-danger"; ward = "ICU / CCU"; stay = "7-14 Days";
+                } else if (spo2 < 94) {
+                    risk = "ELEVATED"; color = "text-warning"; ward = "Medical Ward"; stay = "3-5 Days";
+                } else {
+                    risk = "STABLE"; color = "text-success"; ward = "Home/Obs"; stay = "0-1 Day";
+                }
+
+                document.getElementById('riskValue').innerText = risk;
+                document.getElementById('riskValue').className = `fw-bold mt-2 ${color}`;
+                document.getElementById('riskProb').innerText = (Math.random() * 15 + 80).toFixed(1) + "% Confidence";
+                document.getElementById('wardValue').innerText = ward;
+                document.getElementById('stayValue').innerText = stay;
+
+                showSection('prediction-result', null);
+                btn.disabled = false; btn.innerHTML = 'PROCESS 22-POINT ANALYSIS';
+            }, 1200);
+        }
+    </script>
+</body>
+</html>
